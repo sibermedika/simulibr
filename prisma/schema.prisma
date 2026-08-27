@@ -1,0 +1,87 @@
+// Prisma Schema for Educational HTML Simulator Hub & Curator
+// Datasource PostgreSQL configuration
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN_CLUSTER
+  TEACHER_CLUSTER
+  STUDENT_CLUSTER
+}
+
+model Cluster {
+  id                 String      @id @default(uuid())
+  name               String
+  code               String      @unique
+  description        String?
+  logoUrl            String?
+  subscriptionTier   String      @default("PRO") // FREE_TRIAL, PRO, ENTERPRISE
+  subscriptionStatus String      @default("ACTIVE") // ACTIVE, EXPIRED, TRIAL
+  maxSimulators      Int         @default(50)
+  maxTeachers        Int         @default(10)
+  primaryColor       String?     @default("#0284c7")
+  users              User[]
+  simulators         Simulator[]
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  @@map("clusters")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  name      String?
+  email     String?  @unique
+  password  String
+  role      Role     @default(STUDENT_CLUSTER)
+  clusterId String?
+  cluster   Cluster? @relation(fields: [clusterId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Category {
+  id          String      @id @default(uuid())
+  name        String      @unique
+  slug        String      @unique
+  description String?
+  icon        String?     @default("Atom")
+  color       String?     @default("blue")
+  simulators  Simulator[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("categories")
+}
+
+model Simulator {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String   @db.Text
+  filePath    String?  // Relative path if stored as single-file HTML in storage
+  htmlContent String   @db.Text // Full inline single-file HTML code
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  clusterId   String?
+  cluster     Cluster? @relation(fields: [clusterId], references: [id], onDelete: Cascade)
+  isPublished Boolean  @default(true)
+  viewsCount  Int      @default(0)
+  tags        String[] @default([])
+  author      String   @default("Educator")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("simulators")
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Educational HTML Simulator Hub & Curator",
+  "description": "Platform web terpusat untuk mengumpulkan, mengorganisasi, dan memublikasikan simulator interaktif single-file HTML dan virtual lab edukasi.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

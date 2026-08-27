@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # -------------------------------------------------------------
+  # 1. Aplikasi Utama (EduSim Hub & Curator)
+  # -------------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: edusim_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - JWT_SECRET=eduhub_vps_super_secure_jwt_token_secret_key_2026
+      - SUPERADMIN_USERNAME=superadmin
+      - SUPERADMIN_PASSWORD=superadmin123
+      
+      # Mode Database SQLite (Default Zero-Config):
+      - DB_TYPE=sqlite
+
+      # Jika ingin menggunakan MySQL container di bawah, un-comment baris ini:
+      # - DB_TYPE=mysql
+      # - MYSQL_HOST=mysql_db
+      # - MYSQL_PORT=3306
+      # - MYSQL_USER=edusim_user
+      # - MYSQL_PASSWORD=edusim_password_123
+      # - MYSQL_DATABASE=edusim
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+    # depends_on:
+    #   - mysql_db
+
+  # -------------------------------------------------------------
+  # 2. Database MySQL (Opsional jika memilih mode MySQL)
+  # -------------------------------------------------------------
+  # mysql_db:
+  #   image: mysql:8.0
+  #   container_name: edusim_mysql
+  #   restart: always
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root_password_super_secret
+  #     MYSQL_DATABASE: edusim
+  #     MYSQL_USER: edusim_user
+  #     MYSQL_PASSWORD: edusim_password_123
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
+  #     - ./schema.sql:/docker-entrypoint-initdb.d/init.sql
+  #   ports:
+  #     - "3306:3306"
+
+# volumes:
+#   mysql_data:
